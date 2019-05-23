@@ -1,0 +1,41 @@
+{ "classe" :[
+
+   "guerriero", 
+   "paladino", 
+   "chierico", 
+   "mago",
+   "stregone", 
+   "ladro",
+   "assassino", 
+   "monaco",
+   "barbaro"
+],
+"razza": [
+   "nano",
+   "elfo",
+   "umano",
+   "halfling"
+],
+"genere":[  
+   "maschio",
+   "femmina",
+   "dubbio"
+],
+"allineamento":[  
+   
+   "Legale Buono",	"Neutrale Buono",	"Caotico Buono", "Legale Neutrale",	"Neutrale Neutrale",	"Caotico Neutrale","Legale Malvagio","Neutrale Malvagio","Caotico Malvagio"
+],
+"taglia":[  
+   "colossale ","mastodontica","enorme","grande","media","piccola","minuscola","minuta","piccolissima "
+],
+"dio":[  
+   "Bahamut","Tiamat","Olidammara","Kord","Fharlanghn","Nerull","Pelor","Obad-Hai"
+],
+
+"nomi": [
+[[  "Bagnar","Bali ", "Balin","Balir", "Barin", "Bebur"],[   "alacla", "aladda", "alaenoic", "alaera", "alallyra"],["geran","giri"]],
+[[  "link", "aerandir"],[ "zelda", "nonloso"],["dubbio", "pippo"]],
+[[  "gauss", "laplace"],[ "eva", "sabrina"],["andrea", "alex"]],
+[[  "adalgrim", "bandobras"],["adaldrida", "belladonna"],["alexa", "cortana"]]
+]
+}

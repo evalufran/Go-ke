@@ -1,0 +1,80 @@
+<!doctype html>
+{{if .Success}}
+	<h1>Sheet Complete!</h1>
+{{else}}
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    
+    <title>Crea la tua scheda</title>
+  </head>
+  <body>
+  <br>
+  <center>
+  <h1><span class="badge badge-info">Generatore di schede DnD</span></h1>
+  </center>
+  <br>
+  <br>
+  <br>
+  <center>
+  <h4><span class="badge badge-light">Inserisci le tue preferenze e crea una scheda </span></h4>
+  </center>
+  <br>
+  <br>
+<center>
+    <form action="process" method="POST">
+  <div class="input-group-prepend">
+    <label class="input-group-text" for="classe">Scegli una razza</label>
+  <select class="custom-select" id="classe">
+    <option selected>Seleziona</option>
+    <option value="0">Nano</option>
+    <option value="1">Elfo</option>
+    <option value="2">Umano</option>
+	<option value="3">Halfling</option>
+  </select>
+</div>
+</form>
+</center>
+<br>
+  <br>
+  <form action="process" method="POST">
+<div class="input-group-prepend">
+    <label class="input-group-text" for="genere">Scegli un Genere</label>
+  <select class="custom-select" id="genere">
+    <option selected>Seleziona</option>
+    <option value="0">Maschio</option>
+    <option value="1">Femmina</option>
+    <option value="2">Non specificato</option>
+  </select>
+</div>
+</form>
+<br>
+  <br>
+   <form method="POST">
+   <div class="input-group">
+     <div class="input-group-prepend">
+       <span class="input-group-text">Inserisci qui il tuo nome</span>
+      </div>
+      <input type="text" name="firstname" class="form-control">
+    </div>
+  </form>
+  <br>
+
+<center>
+<input type="submit" value="Crea la mia scheda!">     
+</center>
+<br>
+  <br>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
+{{end}}
