@@ -1,9 +1,6 @@
 <!doctype html>
-{{if .Success}}
-	<h1>Sheet Complete!</h1>
-{{else}}
 <html lang="en">
-  <head>
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -14,23 +11,22 @@
     <title>Crea la tua scheda</title>
   </head>
   <body>
+
+
   <br>
   <center>
   <h1><span class="badge badge-info">Generatore di schede DnD</span></h1>
-  </center>
-  <br>
-  <br>
-  <br>
-  <center>
+</center>
+<br>
+<center>
   <h4><span class="badge badge-light">Inserisci le tue preferenze e crea una scheda </span></h4>
-  </center>
-  <br>
-  <br>
+</center>
+<br>
 <center>
     <form action="process" method="POST">
   <div class="input-group-prepend">
-    <label class="input-group-text" for="classe">Scegli una razza</label>
-  <select class="custom-select" id="classe">
+    <label class="input-group-text" for="razza">Scegli una razza</label>
+  <select class="custom-select" id="razza" name="razza">
     <option selected>Seleziona</option>
     <option value="0">Nano</option>
     <option value="1">Elfo</option>
@@ -38,38 +34,34 @@
 	<option value="3">Halfling</option>
   </select>
 </div>
-</form>
 </center>
 <br>
-  <br>
-  <form action="process" method="POST">
+<br>
+  <center>
 <div class="input-group-prepend">
     <label class="input-group-text" for="genere">Scegli un Genere</label>
-  <select class="custom-select" id="genere">
+  <select class="custom-select" id="genere" name="genere"> 
     <option selected>Seleziona</option>
     <option value="0">Maschio</option>
     <option value="1">Femmina</option>
     <option value="2">Non specificato</option>
   </select>
 </div>
-</form>
+</center>
 <br>
-  <br>
-   <form method="POST">
+<br>
+<center>
    <div class="input-group">
      <div class="input-group-prepend">
        <span class="input-group-text">Inserisci qui il tuo nome</span>
       </div>
       <input type="text" name="firstname" class="form-control">
     </div>
-  </form>
-  <br>
-
-<center>
-<input type="submit" value="Crea la mia scheda!">     
+ 
+<input type="submit" value="Crea la mia scheda!">   
+</form>
 </center>
-<br>
-  <br>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -77,4 +69,3 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   </body>
 </html>
-{{end}}
