@@ -23,16 +23,7 @@ func main() {
 			return
 		}
 
-		details := Datas{
-			Nome:   r.FormValue("firstname"),
-			Genere: r.FormValue("genere"),
-			Razza:  r.FormValue("razza"),
-		}
-
-		// do something with details
-		log.Println(details.Nome)
-		log.Println(details.Genere)
-		log.Println(details.Razza)
+		
 		tmpl1.Execute(w, struct{ Success bool }{true})
 		
 		})
@@ -42,9 +33,17 @@ func main() {
 				tmpl2.Execute(w, nil)
 				return
 			}
-	
+			details := Datas{
+			Nome:   r.FormValue("firstname"),
+			Genere: r.FormValue("genere"),
+			Razza:  r.FormValue("razza"),
+		}
+
+			// do something with details
+			log.Println(details.Nome)
+			log.Println(details.Genere)
+			log.Println(details.Razza)
 			tmpl2.Execute(w, struct{ Success bool }{true})
-			
 			})
 	 http.ListenAndServe(":8080", nil)
 		
