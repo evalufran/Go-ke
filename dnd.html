@@ -16,22 +16,26 @@
   <br>
   <center>
   <h1><span class="badge badge-info">Generatore di schede DnD</span></h1>
-</center>
+
 <br>
-<center>
+
   <h4><span class="badge badge-light">Inserisci le tue preferenze e crea una scheda </span></h4>
-</center>
+
 <br>
-<center>
+
     <form action="process" method="POST">
   <div class="input-group-prepend">
     <label class="input-group-text" for="razza">Scegli una razza</label>
+
   <select class="custom-select" id="razza" name="razza">
     <option selected>Seleziona</option>
-    <option value="0">Nano</option>
-    <option value="1">Elfo</option>
-    <option value="2">Umano</option>
-	<option value="3">Halfling</option>
+    
+     {{range $key, $value := .Razza}}
+
+        <option value=" {{$key}} ">{{$value}} </option>
+      {{end}}
+     
+      
   </select>
 </div>
 </center>
@@ -42,9 +46,9 @@
     <label class="input-group-text" for="genere">Scegli un Genere</label>
   <select class="custom-select" id="genere" name="genere"> 
     <option selected>Seleziona</option>
-    <option value="0">Maschio</option>
-    <option value="1">Femmina</option>
-    <option value="2">Non specificato</option>
+    {{range $key, $value := .Genere}}
+    <option value="{{ $key }}">{{$value}}</option>
+  {{end}}
   </select>
 </div>
 </center>
