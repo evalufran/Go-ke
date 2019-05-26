@@ -16,7 +16,47 @@
 <div class="alert alert-info" role="alert">
     La tua scheda è Pronta!
   </div>
+  <br>
+  <br>
+
 </center>
+<table class="table table-bordered">
+  <thead class="thead-info">
+    <tr>
+      <th scope="col">Nome Giocatore</th>
+      <th scope="col">Nome Personaggio</th>
+      <th scope="col">Genere</th>
+      <th scope="col">Razza</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{.Utente}}</td>
+      <td>{{.Nome}}</td>
+      <td>{{.Genere}}</td>
+      <td>{{.Razza}}</td>
+    </tr>
+    </tbody>
+  </table>
+<table class="table table-bordered">
+  <thead class="thead-info">
+    <tr>
+      <th scope="col">Allineamento</th>
+      <th scope="col">Taglia</th>
+      <th scope="col">Classe</th>
+      <th scope="col">Divinità</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{.Allineamento}}</td>
+      <td>{{.Taglia}}</td>
+      <td>{{.Classe}}</td>
+      <td>{{.Divinita}}</td>
+    </tr>
+  
+  </tbody>
+</table>
 </form>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
