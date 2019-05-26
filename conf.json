@@ -10,6 +10,7 @@
    "monaco",
    "barbaro"
 ],
+ 
 "razza": [
    "nano",
    "elfo",
@@ -25,6 +26,7 @@
    
    "Legale Buono",	"Neutrale Buono",	"Caotico Buono", "Legale Neutrale",	"Neutrale Neutrale",	"Caotico Neutrale","Legale Malvagio","Neutrale Malvagio","Caotico Malvagio"
 ],
+ 
 "taglia":[  
    "colossale ","mastodontica","enorme","grande","media","piccola","minuscola","minuta","piccolissima "
 ],
