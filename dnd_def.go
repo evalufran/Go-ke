@@ -1,10 +1,7 @@
 package main
 
 import (
-	_ "fmt"
-	_ "github.com/balacode/one-file-pdf"
 	"html/template"
-
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -12,8 +9,9 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"strconv"
 )
-
+//funzione di errore
 func checkErrors(err error) {
 	if err != nil {
 		log.Print(err)
@@ -35,7 +33,7 @@ func ReadFromJSON(t interface{}, filename string) error {
 
 	return nil
 }
-
+//Crea una struttura dal json
 type Datas struct {
 	Classe          []string     `json:"classe"`
 	Genere          []string     `json:"genere"`
@@ -47,24 +45,24 @@ type Datas struct {
 }
 
 var Conf Datas
-
+//crea la struttura per la scheda personaggio
 type Personaggio struct {
 	Utente       string
 	Razza        string
 	Genere       string
-	Nome         string
+	NomePersonaggio         string
 	Allineamento string
 	Taglia       string
 	Dio          string
 	Classe       string
 	Selection    []int
 }
-
+//genera scheda del personaggio randomizzata
 func (p *Personaggio) Genera() error {
 
-	selezioneNome := Conf.NomePersonaggio[p.Selection[0]][p.Selection[1]]
+	selezioneNome := Conf.NomePersonaggio[p.Selection[0]][p.Selection[1]] //crea il nome del personaggio basandosi su razza e genere 
 	rand.Seed(time.Now().UnixNano())
-	p.Nome = selezioneNome[rand.Intn(len(selezioneNome))]
+	p.NomePersonaggio =  selezioneNome[rand.Intn(len(selezioneNome))] 
 	p.Allineamento = Conf.Allineamento[rand.Intn(len(Conf.Allineamento))]
 	p.Taglia = Conf.Taglia[rand.Intn(len(Conf.Taglia))]
 	p.Classe = Conf.Classe[rand.Intn(len(Conf.Classe))]
@@ -72,26 +70,16 @@ func (p *Personaggio) Genera() error {
 
 	return nil
 }
-
+//legge il json
 func init() {
 	checkErrors(ReadFromJSON(&Conf, "conf.json"))
 }
 
 func main() {
+	//parsa i templates
 	tmpl1 := template.Must(template.ParseFiles("dnd.html"))
 	tmpl2 := template.Must(template.ParseFiles("answer.html"))
-
-	/*template.FuncMap{
-		"Iterate": func(count *uint) []uint {
-			var i uint
-			var Items []uint
-			for i=0; i<(*count); i++{
-				Items = append(Items,i)
-			}
-			return Items
-		},
-	}*/
-
+//funzione che gestisce le preferenze dell'utente nella pagina home
 	http.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) {
 
 		homeMap := make(map[string]interface{})
@@ -99,32 +87,34 @@ func main() {
 		homeMap["Genere"] = Conf.Genere
 		tmpl1.Execute(w, homeMap)
 
-		log.Println(homeMap["Razza"])
-		log.Println(Conf.Razza)
-
 	})
+	//funzione che gestisce la pagina di riposta /process
 	http.HandleFunc("/process", func(w http.ResponseWriter, r *http.Request) {
-
-		// 	//selezioni := []string{r.FormValue("firstname"), r.FormValue("genere"), r.FormValue("razza")}
-		// 	personaggioUtente := new(Personaggio)
-
-		// 	checkErrors(personaggioUtente.Genera())
-		// 	personaggioUtente.Nome = r.FormValue("Nome")
-		// 	personaggioUtente.Genere = r.FormValue("Genere")
-		// 	personaggioUtente.Selection
-		// 	personaggioUtente.Razza = r.FormValue("Razza")
-
-		// 	//l'indice dell'array delle razze all'elemento con valore = personaggioUtente.Razza
-		// 	//personaggioUtente.Allineamento = personaggioUtente.Allineamento
-		// 	scelte := make(map[string]interface{})
-		// 	scelte["Nome"] = personaggioUtente.Nome
-		// 	scelte["Genere"]= personaggioUtente.Genere
-		// 	scelte["Razza"] = personaggioUtente.Razza
-		// 	//scelte["all"] = personaggioUtente.Allineamento
-		//s	scelte["all"]=all
-		tmpl2.Execute(w, struct{ Success bool }{true})
-
-		//log.Println(scelte)
+		//array di stringhe in cui vengono salvate le scelte dell'utente
+		selezioni:=[]string{ r.FormValue("firstname"), r.FormValue("genere"), r.FormValue("razza")}
+		
+		processMap := make(map[string]interface{})
+		processMap["Utente"] =selezioni[0]
+		//funzione che converte in interi i valori di selezioni
+		convertiGenere,_:=strconv.Atoi(selezioni[1])
+		processMap["Genere"]=Conf.Genere[convertiGenere]
+		//funzione che converte in interi i valori di selezioni
+		convertiRazza,_:=strconv.Atoi(selezioni[2])
+		processMap["Razza"]=Conf.Razza[convertiRazza]
+		//crea l'oggetto personaggio
+		personaggio := new(Personaggio)
+		//inserisce le key dei valori scelti dall'utente dentro p.selection, per poter generare il nome adatto
+		personaggio.Selection =[]int{convertiGenere, convertiRazza}
+		
+		personaggio.Genera()
+		processMap["Nome"] = personaggio.NomePersonaggio
+		processMap["Allineamento"] = personaggio.Allineamento
+		processMap["Taglia"] = personaggio.Taglia
+		processMap["Classe"] = personaggio.Classe
+		processMap["Divinita"] = personaggio.Dio
+		
+		
+		tmpl2.Execute(w, processMap)
 
 	})
 
