@@ -80,47 +80,46 @@ func init() {
 	checkErrors(ReadFromJSON(&Conf, "conf.json"))
 }
 
-func main() {
-	//parsa i templates
+func homeHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl1 := template.Must(template.ParseFiles("dnd.html"))
+	homeMap := make(map[string]interface{})
+	homeMap["Razza"] = Conf.Razza
+	homeMap["Genere"] = Conf.Genere
+	tmpl1.Execute(w, homeMap)
+
+}
+
+func answerHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl2 := template.Must(template.ParseFiles("answer.html"))
-	//funzione che gestisce le preferenze dell'utente nella pagina home
-	http.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) {
 
-		homeMap := make(map[string]interface{})
-		homeMap["Razza"] = Conf.Razza
-		homeMap["Genere"] = Conf.Genere
-		tmpl1.Execute(w, homeMap)
+	//array di stringhe in cui vengono salvate le scelte dell'utente
+	selezioni := []string{r.FormValue("firstname"), r.FormValue("genere"), r.FormValue("razza")}
 
-	})
-	//funzione che gestisce la pagina di riposta /process
-	http.HandleFunc("/process", func(w http.ResponseWriter, r *http.Request) {
-		//array di stringhe in cui vengono salvate le scelte dell'utente
-		selezioni := []string{r.FormValue("firstname"), r.FormValue("genere"), r.FormValue("razza")}
+	processMap := make(map[string]interface{}) //mappa per salvare i parametri
+	processMap["Utente"] = selezioni[0]
+	convertiGenere, _ := strconv.Atoi(selezioni[1]) //funzione che converte in interi i valori di selezioni
+	processMap["Genere"] = Conf.Genere[convertiGenere]
+	convertiRazza, _ := strconv.Atoi(selezioni[2]) //funzione che converte in interi i valori di selezioni
+	processMap["Razza"] = Conf.Razza[convertiRazza]
+	personaggio := new(Personaggio) //crea l'oggetto personaggio
+	//inserisce le key dei valori scelti dall'utente dentro p.selection, per poter generare il nome adatto
+	personaggio.Selection = []int{convertiGenere, convertiRazza}
 
-		processMap := make(map[string]interface{})
-		processMap["Utente"] = selezioni[0]
-		//funzione che converte in interi i valori di selezioni
-		convertiGenere, _ := strconv.Atoi(selezioni[1])
-		processMap["Genere"] = Conf.Genere[convertiGenere]
-		//funzione che converte in interi i valori di selezioni
-		convertiRazza, _ := strconv.Atoi(selezioni[2])
-		processMap["Razza"] = Conf.Razza[convertiRazza]
-		//crea l'oggetto personaggio
-		personaggio := new(Personaggio)
-		//inserisce le key dei valori scelti dall'utente dentro p.selection, per poter generare il nome adatto
-		personaggio.Selection = []int{convertiGenere, convertiRazza}
+	personaggio.Genera()
+	processMap["Nome"] = personaggio.NomePersonaggio
+	processMap["Allineamento"] = personaggio.Allineamento
+	processMap["Taglia"] = personaggio.Taglia
+	processMap["Classe"] = personaggio.Classe
+	processMap["Divinita"] = personaggio.Dio
 
-		personaggio.Genera()
-		processMap["Nome"] = personaggio.NomePersonaggio
-		processMap["Allineamento"] = personaggio.Allineamento
-		processMap["Taglia"] = personaggio.Taglia
-		processMap["Classe"] = personaggio.Classe
-		processMap["Divinita"] = personaggio.Dio
+	tmpl2.Execute(w, processMap)
 
-		tmpl2.Execute(w, processMap)
+}
 
-	})
+func main() {
 
-	http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/home", homeHandler)      //handler della pagina home
+	http.HandleFunc("/process", answerHandler) //handler della pagina di risposta /process
+
+	log.Fatal(http.ListenAndServe(":8080", nil)) //hosting pagina
 }
