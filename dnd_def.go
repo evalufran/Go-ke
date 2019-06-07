@@ -1,16 +1,19 @@
 package main
 
 import (
-	"html/template"
 	"encoding/json"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"os"
-	"time"
 	"strconv"
+	"time"
+
+	"github.com/jung-kurt/gofpdf"
 )
+
 //funzione di errore
 func checkErrors(err error) {
 	if err != nil {
@@ -33,6 +36,7 @@ func ReadFromJSON(t interface{}, filename string) error {
 
 	return nil
 }
+
 //Crea una struttura dal json
 type Datas struct {
 	Classe          []string     `json:"classe"`
@@ -45,24 +49,26 @@ type Datas struct {
 }
 
 var Conf Datas
+
 //crea la struttura per la scheda personaggio
 type Personaggio struct {
-	Utente       string
-	Razza        string
-	Genere       string
-	NomePersonaggio         string
-	Allineamento string
-	Taglia       string
-	Dio          string
-	Classe       string
-	Selection    []int
+	Utente          string
+	Razza           string
+	Genere          string
+	NomePersonaggio string
+	Allineamento    string
+	Taglia          string
+	Dio             string
+	Classe          string
+	Selection       []int
 }
+
 //genera scheda del personaggio randomizzata
 func (p *Personaggio) Genera() error {
 
-	selezioneNome := Conf.NomePersonaggio[p.Selection[0]][p.Selection[1]] //crea il nome del personaggio basandosi su razza e genere 
+	selezioneNome := Conf.NomePersonaggio[p.Selection[1]][p.Selection[0]] //crea il nome del personaggio basandosi su razza e genere
 	rand.Seed(time.Now().UnixNano())
-	p.NomePersonaggio =  selezioneNome[rand.Intn(len(selezioneNome))] 
+	p.NomePersonaggio = selezioneNome[rand.Intn(len(selezioneNome))]
 	p.Allineamento = Conf.Allineamento[rand.Intn(len(Conf.Allineamento))]
 	p.Taglia = Conf.Taglia[rand.Intn(len(Conf.Taglia))]
 	p.Classe = Conf.Classe[rand.Intn(len(Conf.Classe))]
@@ -70,53 +76,83 @@ func (p *Personaggio) Genera() error {
 
 	return nil
 }
+
 //legge il json
 func init() {
 	checkErrors(ReadFromJSON(&Conf, "conf.json"))
 }
 
-func main() {
-	//parsa i templates
+func homeHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl1 := template.Must(template.ParseFiles("dnd.html"))
+	homeMap := make(map[string]interface{})
+	homeMap["Razza"] = Conf.Razza
+	homeMap["Genere"] = Conf.Genere
+	tmpl1.Execute(w, homeMap)
+
+}
+
+func answerHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl2 := template.Must(template.ParseFiles("answer.html"))
-//funzione che gestisce le preferenze dell'utente nella pagina home
-	http.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) {
 
-		homeMap := make(map[string]interface{})
-		homeMap["Razza"] = Conf.Razza
-		homeMap["Genere"] = Conf.Genere
-		tmpl1.Execute(w, homeMap)
+	//array di stringhe in cui vengono salvate le scelte dell'utente
+	selezioni := []string{r.FormValue("firstname"), r.FormValue("genere"), r.FormValue("razza")}
 
-	})
-	//funzione che gestisce la pagina di riposta /process
-	http.HandleFunc("/process", func(w http.ResponseWriter, r *http.Request) {
-		//array di stringhe in cui vengono salvate le scelte dell'utente
-		selezioni:=[]string{ r.FormValue("firstname"), r.FormValue("genere"), r.FormValue("razza")}
-		
-		processMap := make(map[string]interface{})
-		processMap["Utente"] =selezioni[0]
-		//funzione che converte in interi i valori di selezioni
-		convertiGenere,_:=strconv.Atoi(selezioni[1])
-		processMap["Genere"]=Conf.Genere[convertiGenere]
-		//funzione che converte in interi i valori di selezioni
-		convertiRazza,_:=strconv.Atoi(selezioni[2])
-		processMap["Razza"]=Conf.Razza[convertiRazza]
-		//crea l'oggetto personaggio
-		personaggio := new(Personaggio)
-		//inserisce le key dei valori scelti dall'utente dentro p.selection, per poter generare il nome adatto
-		personaggio.Selection =[]int{convertiGenere, convertiRazza}
-		
-		personaggio.Genera()
-		processMap["Nome"] = personaggio.NomePersonaggio
-		processMap["Allineamento"] = personaggio.Allineamento
-		processMap["Taglia"] = personaggio.Taglia
-		processMap["Classe"] = personaggio.Classe
-		processMap["Divinita"] = personaggio.Dio
-		
-		
-		tmpl2.Execute(w, processMap)
+	processMap := make(map[string]interface{}) //mappa per salvare i parametri
+	processMap["Utente"] = selezioni[0]
+	convertiGenere, _ := strconv.Atoi(selezioni[1]) //funzione che converte in interi i valori di selezioni
+	processMap["Genere"] = Conf.Genere[convertiGenere]
+	convertiRazza, _ := strconv.Atoi(selezioni[2]) //funzione che converte in interi i valori di selezioni
+	processMap["Razza"] = Conf.Razza[convertiRazza]
+	personaggio := new(Personaggio) //crea l'oggetto personaggio
+	//inserisce le key dei valori scelti dall'utente dentro p.selection, per poter generare il nome adatto
+	personaggio.Selection = []int{convertiGenere, convertiRazza}
 
-	})
+	personaggio.Genera()
+	processMap["Nome"] = personaggio.NomePersonaggio
+	processMap["Allineamento"] = personaggio.Allineamento
+	processMap["Taglia"] = personaggio.Taglia
+	processMap["Classe"] = personaggio.Classe
+	processMap["Divinita"] = personaggio.Dio
 
-	http.ListenAndServe(":8080", nil)
+	tmpl2.Execute(w, processMap)
+
+	pdf := gofpdf.New("P", "mm", "A4", "") //crea il pdf
+	pdf.AddPage()                          //crea la pagina
+	pdf.SetFont("Arial", "B", 12)          //imposta il font
+	pdf.Cell(40, 10, "Giocatore")          //crea la Nome Giocatore
+	pdf.Cell(40, 10, "Personaggio")        //crea la Nome Personaggio
+	pdf.Ln(8)
+	pdf.SetFont("Arial", "", 10)
+	pdf.Cell(40, 10, r.FormValue("firstname"))    //la seconda scritta è consecutiva alla prima
+	pdf.Cell(40, 10, personaggio.NomePersonaggio) //la seconda scritta è consecutiva alla prima
+	pdf.Ln(8)
+	pdf.SetFont("Arial", "B", 12) //imposta il font
+	pdf.Cell(40, 10, "Razza")     //crea la scritta
+	pdf.Cell(40, 10, "Genere")    //crea la scritta
+	pdf.Ln(8)                     //a capo (spaziatura normale)
+	pdf.SetFont("Arial", "", 10)
+	pdf.Cell(40, 10, Conf.Razza[convertiRazza])   //la seconda scritta è consecutiva alla prima
+	pdf.Cell(40, 10, Conf.Genere[convertiGenere]) //la seconda scritta è consecutiva alla prima
+	pdf.Ln(8)                                     //a capo (spaziatura normale)
+	pdf.SetFont("Arial", "B", 12)                 //imposta il font
+	pdf.Cell(40, 10, "Allineamento")              //crea la scritta
+	pdf.Cell(40, 10, "Taglia")                    //crea la scritta
+	pdf.Cell(40, 10, "Classe")                    //crea la scritta
+	pdf.Cell(40, 10, "Divinita'")                 //crea la scritta
+	pdf.Ln(8)
+	pdf.SetFont("Arial", "", 10)
+	pdf.Cell(40, 10, personaggio.Allineamento)           //la seconda scritta è consecutiva alla prima
+	pdf.Cell(40, 10, personaggio.Taglia)                 //la seconda scritta è consecutiva alla prima
+	pdf.Cell(40, 10, personaggio.Classe)                 //la seconda scritta è consecutiva alla prima
+	pdf.Cell(40, 10, personaggio.Dio)                    //la seconda scritta è consecutiva alla prima
+	pdf.OutputFileAndClose("LaMiaSchedaPersonaggio.pdf") //salva il pdf
+
+}
+
+func main() {
+
+	http.HandleFunc("/home", homeHandler)      //handler della pagina home
+	http.HandleFunc("/process", answerHandler) //handler della pagina di risposta /process
+
+	log.Fatal(http.ListenAndServe(":8080", nil)) //hosting pagina
 }
