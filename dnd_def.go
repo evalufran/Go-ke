@@ -10,6 +10,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/jung-kurt/gofpdf"
 )
 
 //funzione di errore
@@ -113,6 +115,37 @@ func answerHandler(w http.ResponseWriter, r *http.Request) {
 	processMap["Divinita"] = personaggio.Dio
 
 	tmpl2.Execute(w, processMap)
+
+	pdf := gofpdf.New("P", "mm", "A4", "") //crea il pdf
+	pdf.AddPage()                          //crea la pagina
+	pdf.SetFont("Arial", "B", 12)          //imposta il font
+	pdf.Cell(40, 10, "Giocatore")          //crea la Nome Giocatore
+	pdf.Cell(40, 10, "Personaggio")        //crea la Nome Personaggio
+	pdf.Ln(8)
+	pdf.SetFont("Arial", "", 10)
+	pdf.Cell(40, 10, r.FormValue("firstname"))    //la seconda scritta è consecutiva alla prima
+	pdf.Cell(40, 10, personaggio.NomePersonaggio) //la seconda scritta è consecutiva alla prima
+	pdf.Ln(8)
+	pdf.SetFont("Arial", "B", 12) //imposta il font
+	pdf.Cell(40, 10, "Razza")     //crea la scritta
+	pdf.Cell(40, 10, "Genere")    //crea la scritta
+	pdf.Ln(8)                     //a capo (spaziatura normale)
+	pdf.SetFont("Arial", "", 10)
+	pdf.Cell(40, 10, Conf.Razza[convertiRazza])   //la seconda scritta è consecutiva alla prima
+	pdf.Cell(40, 10, Conf.Genere[convertiGenere]) //la seconda scritta è consecutiva alla prima
+	pdf.Ln(8)                                     //a capo (spaziatura normale)
+	pdf.SetFont("Arial", "B", 12)                 //imposta il font
+	pdf.Cell(40, 10, "Allineamento")              //crea la scritta
+	pdf.Cell(40, 10, "Taglia")                    //crea la scritta
+	pdf.Cell(40, 10, "Classe")                    //crea la scritta
+	pdf.Cell(40, 10, "Divinita'")                 //crea la scritta
+	pdf.Ln(8)
+	pdf.SetFont("Arial", "", 10)
+	pdf.Cell(40, 10, personaggio.Allineamento)           //la seconda scritta è consecutiva alla prima
+	pdf.Cell(40, 10, personaggio.Taglia)                 //la seconda scritta è consecutiva alla prima
+	pdf.Cell(40, 10, personaggio.Classe)                 //la seconda scritta è consecutiva alla prima
+	pdf.Cell(40, 10, personaggio.Dio)                    //la seconda scritta è consecutiva alla prima
+	pdf.OutputFileAndClose("LaMiaSchedaPersonaggio.pdf") //salva il pdf
 
 }
 
